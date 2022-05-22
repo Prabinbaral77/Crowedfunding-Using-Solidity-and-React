@@ -8,7 +8,7 @@ const CurrentRequest = () => {
     setIsOpen(!isOpen);
   };
   return (
-    <div>
+    <div id="requests">
       <div className="-mt-[2.2rem] text-center text-2xl font-semibold pb-10 text-white md:mt-[5rem] ">
         Trending Campaign
       </div>

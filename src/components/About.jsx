@@ -3,7 +3,7 @@ import Logo from "../../assets/eth.jpg";
 
 const About = () => {
   return (
-    <div className="mt-[10rem]">
+    <div className="mt-[10rem]" id="about">
       <div className="pt-1 text-center text-2xl font-semibold pb-10 text-white">
         About <span className="text-yellow-200">CrowedFunding</span>
       </div>

@@ -12,13 +12,13 @@ const Navbar = () => {
           <img src={Logo} className="w-full h-full rounded-2xl" />
         </div>
         <div className="cursor-pointer hover:text-yellow-400 hidden md:flex">
-          About
+          <a href="#about">About</a>
         </div>
         <div className="cursor-pointer hover:text-yellow-400 hidden md:flex">
           Transactions
         </div>
         <div className="cursor-pointer hover:text-yellow-400 hidden md:flex">
-          Current Requests
+          <a href="#requests">Current Requests</a>
         </div>
         <div className="hidden md:flex absolute right-12 bg-yellow-400 px-7 py-2 rounded-xl cursor-pointer text-gray-500 hover:text-yellow-400 hover:bg-gray-500 transition-all duration-150 ease-in-out">
           Connect wallet
@@ -40,12 +40,17 @@ const Navbar = () => {
             <li className="text-xl w-full my-2">
               <AiOutlineClose onClick={() => setToggleMenu(false)} />
             </li>
-            <div className="cursor-pointer hover:text-yellow-400 ">About</div>
+            <div className="cursor-pointer hover:text-yellow-400 ">
+              <a href="#about">About</a>
+            </div>
             <div className="cursor-pointer hover:text-yellow-400 ">
               Transactions
             </div>
-            <div className="cursor-pointer hover:text-yellow-400 ">
-              Current Requests
+            <div className="cursor-pointer hover:text-yellow-400  ">
+              <a href="#requests">
+                {" "}
+                <a href="#requests">Current Requests</a>
+              </a>
             </div>
             <div className="bg-yellow-400 font-semibold px-2 py-1 rounded-lg ">
               Connect wallet
