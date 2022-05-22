@@ -1,10 +1,11 @@
 import React from "react";
 import { Progress } from "reactstrap";
+import Campaign from "../utils/Modals/Campaign";
 
-const Card = () => {
+const Card = ({ isOpen, handleModal, setIsOpen }) => {
   return (
-    <div>
-      <div className="w-[23rem] h-[16.5rem] campaign-card rounded-xl text-white mx-auto px-5 pt-4">
+    <div onClick={() => setIsOpen(true)}>
+      <div className="w-[23rem] h-[16.5rem] campaign-card rounded-xl text-white mx-auto px-5 pt-4 cursor-pointer">
         <p>
           {" "}
           <span className="font-bold text-xl text-yellow-50">Title :</span>
@@ -34,12 +35,13 @@ const Card = () => {
 
         <div className="mx-[15%] py-3">
           <Progress animated striped value={75} className="w-full h-[0.6rem]" />
-          <p>70 Raised out of 100</p>
+          <p>70% vote out of 100%</p>
         </div>
         <div className="text-xl bg-yellow-600 px-4 py-2 w-[60%] mx-auto rounded-full cursor-pointer text-blue-600 font-bold shadow-xl hover:scale-95 hover:bg-yellow-500 transition-all duration-100">
           Raise Fund
         </div>
       </div>
+      <Campaign open={isOpen} handleModal={handleModal} />
     </div>
   );
 };
