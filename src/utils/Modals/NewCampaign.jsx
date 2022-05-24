@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { CrowedFundingContext } from "../../context/CrowedFundingContext";
 import {
   Button,
   Input,
@@ -9,6 +10,7 @@ import {
 } from "reactstrap";
 
 const NewCampaignModal = ({ open, closeModal }) => {
+  const { currentAccount } = useContext(CrowedFundingContext);
   return (
     <Modal
       centered

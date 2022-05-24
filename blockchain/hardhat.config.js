@@ -1,21 +1,16 @@
 require("@nomiclabs/hardhat-waffle");
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+const ALCHEMY_PRIVATE_KEY =
+  "https://eth-ropsten.alchemyapi.io/v2/uIUpRVSfHTAFZFXiw1eG5OAtfL2jadno";
+const RINKEBY_PRIVATE_KEY =
+  "5c33bf5710995203068c4d6cd8ca7a2b97727e9fb0604448677b2a3aadd2158e";
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
 module.exports = {
   solidity: "0.8.4",
+  networks: {
+    rinkeby: {
+      url: ALCHEMY_PRIVATE_KEY,
+      accounts: [`${RINKEBY_PRIVATE_KEY}`],
+    },
+  },
 };

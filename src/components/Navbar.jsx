@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Logo from "../../assets/Logo.png";
 import { AiOutlineClose } from "react-icons/ai";
 import { HiMenuAlt4 } from "react-icons/hi";
+import { CrowedFundingContext } from "../context/CrowedFundingContext";
 
 const Navbar = () => {
   const [toggleMenu, setToggleMenu] = useState(false);
+  const { connectWallet, currentAccount } = useContext(CrowedFundingContext);
   return (
     <div>
       <div className="flex items-center justify-center gradient-bg-welcome w-full h-[4rem] gap-x-8 md:gap-x-16 text-gray-200 relative ">
@@ -20,9 +22,21 @@ const Navbar = () => {
         <div className="cursor-pointer hover:text-yellow-400 hidden md:flex">
           <a href="#requests">Current Requests</a>
         </div>
-        <div className="hidden md:flex absolute right-12 bg-yellow-400 px-7 py-2 rounded-xl cursor-pointer text-gray-500 hover:text-yellow-400 hover:bg-gray-500 transition-all duration-150 ease-in-out">
-          Connect wallet
-        </div>
+        {!currentAccount ? (
+          <div
+            className="hidden md:flex absolute right-12 bg-yellow-400 px-7 py-2 rounded-xl cursor-pointer text-gray-500 hover:text-yellow-400 hover:bg-gray-500 transition-all duration-150 ease-in-out"
+            onClick={connectWallet}
+          >
+            Connect wallet
+          </div>
+        ) : (
+          <div
+            className="hidden md:flex absolute right-12 bg-yellow-400 px-7 py-2 rounded-xl cursor-pointer text-gray-500 hover:text-yellow-400 hover:bg-gray-500 transition-all duration-150 ease-in-out"
+            onClick={connectWallet}
+          >
+            connected
+          </div>
+        )}
         {toggleMenu ? (
           <AiOutlineClose
             fontSize={28}
@@ -52,9 +66,21 @@ const Navbar = () => {
                 <a href="#requests">Current Requests</a>
               </a>
             </div>
-            <div className="bg-yellow-400 font-semibold px-2 py-1 rounded-lg ">
-              Connect wallet
-            </div>
+            {!currentAccount ? (
+              <div
+                className="bg-yellow-400 font-semibold px-2 py-1 rounded-lg "
+                onClick={connectWallet}
+              >
+                Connect wallet
+              </div>
+            ) : (
+              <div
+                className="bg-yellow-400 font-semibold px-2 py-1 rounded-lg "
+                onClick={connectWallet}
+              >
+                Connected
+              </div>
+            )}
           </ul>
         )}
       </div>

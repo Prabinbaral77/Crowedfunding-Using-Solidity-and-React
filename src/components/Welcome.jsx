@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { RiFundsFill } from "react-icons/ri";
 import NewCampaignModal from "../utils/Modals/NewCampaign";
+import { CrowedFundingContext } from "../context/CrowedFundingContext";
+import { shortenAddress } from "../utils/shortenAddress";
 
 const Welcome = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentAccount } = useContext(CrowedFundingContext);
 
   const closeModal = () => {
     setIsOpen(!isOpen);
@@ -41,7 +44,8 @@ const Welcome = () => {
           </div>
         </div>
         <div className="pt-[4rem] text-center font-bold">
-          <span className="text-xl">Wallet Address</span>: afd4478g.....fd4fgry
+          <span className="text-xl">Wallet Address</span>:
+          {shortenAddress(currentAccount)}
         </div>
       </div>
       <hr className="mt-[9rem] w-[70%] mx-auto text-white" />
