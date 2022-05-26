@@ -45,7 +45,7 @@ const Welcome = () => {
         </div>
         <div className="pt-[4rem] text-center font-bold">
           <span className="text-xl">Wallet Address</span>:
-          {shortenAddress(currentAccount)}
+          {currentAccount && shortenAddress(currentAccount)}
         </div>
       </div>
       <hr className="mt-[9rem] w-[70%] mx-auto text-white" />

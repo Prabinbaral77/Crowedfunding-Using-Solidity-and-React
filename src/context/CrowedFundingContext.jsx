@@ -20,6 +20,27 @@ const getCrowedFundingContract = async () => {
 
 export const CrowedFundingProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState();
+  const [totalRequest, setTotalRequest] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    campaignName: "",
+    description: "",
+    reqAmount: "",
+    receipentAddress: "",
+    date: "",
+  });
+
+  const handleChange = async (e, name) => {
+    if (name !== "date") {
+      setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
+    } else {
+      const enteredDate = new Date(e.target.value);
+      const currentDate = new Date(Date.now());
+      const timeDiff = Math.abs(enteredDate - currentDate);
+      const diffInSecond = Math.ceil(timeDiff / 1000);
+      setFormData((prevState) => ({ ...prevState, [name]: diffInSecond }));
+    }
+  };
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -51,11 +72,74 @@ export const CrowedFundingProvider = ({ children }) => {
     }
   };
 
+  const handleNewRequests = async () => {
+    try {
+      if (!ethereum) return alert("Please Install Metamask.");
+      const crowedFundingContract = await getCrowedFundingContract();
+      const { campaignName, description, reqAmount, receipentAddress, date } =
+        formData;
+      const parsedAmount = ethers.utils.parseEther(reqAmount);
+      const requestHash = await crowedFundingContract.createRequest(
+        campaignName,
+        description,
+        receipentAddress,
+        date,
+        parsedAmount._hex
+      );
+      setIsLoading(true);
+      await requestHash.wait();
+      setIsLoading(false);
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
+  const getFundingRequests = async () => {
+    try {
+      if (!ethereum) return alert("Please Install Metamask.");
+      const crowedFundingContract = await getCrowedFundingContract();
+      const noOfRequests = await crowedFundingContract.noOfRequests();
+      let allRequests = [];
+      for (let i = 0; i < parseInt(noOfRequests._hex); i++) {
+        const tempRequest = await crowedFundingContract.requests(i);
+        allRequests.push(tempRequest);
+      }
+      const structuredRequests = allRequests.map((request) => ({
+        requestNo: parseInt(request.requestNo._hex),
+        title: request.title,
+        description: request.description,
+        receipent: request.recipient,
+        deadline: new Date(request.deadline.toNumber() * 1000).toLocaleString(),
+        target: parseInt(request.target._hex) / 10 ** 18,
+        completed: request.completed,
+        voter: parseInt(request.noOfVoters._hex),
+        contributer: parseInt(request.noOfContributer._hex),
+      }));
+
+      setTotalRequest(structuredRequests);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  };
+
   useEffect(() => {
     checkIfWalletIsConnected();
-  }, []);
+    getFundingRequests();
+  }, [isLoading]);
   return (
-    <CrowedFundingContext.Provider value={{ currentAccount, connectWallet }}>
+    <CrowedFundingContext.Provider
+      value={{
+        currentAccount,
+        connectWallet,
+        formData,
+        setFormData,
+        handleChange,
+        handleNewRequests,
+        isLoading,
+        totalRequest,
+      }}
+    >
       {children}
     </CrowedFundingContext.Provider>
   );

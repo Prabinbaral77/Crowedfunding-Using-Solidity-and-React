@@ -2,11 +2,9 @@
 pragma solidity ^0.8.0;
 
 contract CrowedFunding {
-    mapping(address => uint) public contributer;
     address public manager;
     uint public minContribution;
-    uint public noOfContributer;
-    uint public raisedAmount;
+    // mapping(address => mapping(uint => uint)) public contributer; //first int in second mapping refers to the requestNo and second is contribution
 
 
     struct Request {
@@ -14,11 +12,14 @@ contract CrowedFunding {
         string description;
         address payable recipient;
         uint noOfVoters;
+        uint noOfContributer;
+        uint raisedAmount;
         uint  target;
         uint  deadline;
         bool completed;
         uint requestNo;
         mapping(address => bool) voters;
+        mapping(address => uint) contributer;
     }
 
     mapping(uint => Request) public requests;
@@ -29,28 +30,47 @@ contract CrowedFunding {
         minContribution = 100 wei;
     }
 
+    function createRequest(string memory _title, string memory _description, address payable _recipient, uint _deadline, uint _target) public onlyManager {
+    Request storage newRequest = requests[noOfRequests];
+    newRequest.requestNo = noOfRequests;
+    noOfRequests ++;
+    newRequest.title = _title;
+    newRequest.description = _description;
+    newRequest.recipient = _recipient;
+    newRequest.deadline = block.timestamp + _deadline;
+    newRequest.target = _target;
+    newRequest.completed = false;
+    newRequest.noOfVoters = 0;
+    newRequest.noOfContributer = 0;
+    newRequest.raisedAmount = 0;
+}
 
-    function sendEth() external payable {
+
+    function sendEth(uint _requestNo) external payable {
         require(msg.value > minContribution, "Minimum contribution of 100 wei required.");
-        if(contributer[msg.sender] == 0) {
-            noOfContributer += 1;
+        Request storage thisRequest = requests[_requestNo];
+        if(thisRequest.contributer[msg.sender] == 0) {
+            thisRequest.noOfContributer += 1;
         }
-        contributer[msg.sender] += msg.value;
-        raisedAmount += msg.value;
+        thisRequest.contributer[msg.sender] += msg.value;
+        thisRequest.raisedAmount += msg.value;
     }
 
 
-    function getContractBalance() external view returns(uint) {
-        return address(this).balance;
+    function getRequestBalance(uint _requestNo) external view returns(uint) {
+        Request storage thisRequest = requests[_requestNo];
+        return thisRequest.raisedAmount;
     }
 
 
-    function refund() public {
+    function refund(uint _requestNo) public {
+        Request storage thisRequest = requests[_requestNo];
+        require(block.timestamp > thisRequest.deadline, "you cannot get refund before deadline");
         require(msg.sender == manager , "You need to mangaer to refund the money");
-        require(contributer[msg.sender] > 0, "You didnot contribute for this project.");
+        require(thisRequest.contributer[msg.sender] > 0, "You didnot contribute for this project.");
         address payable user = payable(msg.sender);
-        user.transfer(contributer[msg.sender]);
-        contributer[msg.sender] = 0;
+        user.transfer(thisRequest.contributer[msg.sender]);
+        thisRequest.contributer[msg.sender] = 0;
     }
 
     modifier onlyManager() {
@@ -58,32 +78,20 @@ contract CrowedFunding {
         _;
     }
 
-    function createRequest(string memory _title, string memory _description, address payable _recipient, uint _deadline, uint _target) public onlyManager {
-        Request storage newRequest = requests[noOfRequests];
-        newRequest.requestNo = noOfRequests;
-        noOfRequests ++;
-        newRequest.title = _title;
-        newRequest.description = _description;
-        newRequest.recipient = _recipient;
-        newRequest.deadline = block.timestamp + _deadline;
-        newRequest.target = _target;
-        newRequest.completed = false;
-        newRequest.noOfVoters = 0;
-    }
 
     function voteRequest(uint _requestNo) public {
-        require(contributer[msg.sender] > 0, "You must contribute to vote");
-        Request storage thisRequest = requests[_requestNo];
+        Request storage thisRequest = requests[_requestNo]; 
+        require(thisRequest.contributer[msg.sender] > 0, "You must contribute to vote");
         require(thisRequest.voters[msg.sender] == false, "You have already voted.");
         thisRequest.voters[msg.sender] = true;
         thisRequest.noOfVoters ++;
     }
 
-    function makePayment(uint _requestNo) public {
+    function makePayment(uint _requestNo) public onlyManager {
         Request storage thisRequest = requests[_requestNo];
-        require(raisedAmount >= thisRequest.target, "Required Amount is not raised.");
+        require(thisRequest.raisedAmount >= thisRequest.target, "Required Amount is not raised.");
         require(thisRequest.completed == false, "The request has already been completed.");
-        require(thisRequest.noOfVoters > noOfContributer / 2, "Majority vote is required to proceed payment.");
+        require(thisRequest.noOfVoters > thisRequest.noOfContributer / 2, "Majority vote is required to proceed payment.");
         thisRequest.recipient.transfer(thisRequest.target);
         thisRequest.completed = true;
     }

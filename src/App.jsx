@@ -7,7 +7,7 @@ import {
   Footer,
 } from "./components";
 
-function App() {
+export const App = () => {
   return (
     <div className="gradient-bg-welcome overflow-hidden">
       <Navbar />
@@ -18,6 +18,4 @@ function App() {
       <Footer />
     </div>
   );
-}
-
-export default App;
+};
