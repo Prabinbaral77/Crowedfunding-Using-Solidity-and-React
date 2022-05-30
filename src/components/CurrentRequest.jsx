@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import Card from "./Card";
 import { CrowedFundingContext } from "../context/CrowedFundingContext";
+import Campaign from "../utils/Modals/Campaign";
 
 const CurrentRequest = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,18 +16,11 @@ const CurrentRequest = () => {
       </div>
       <div className="w-[90%] mx-auto flex flex-col gap-y-20 mf:flex-row mf:flex-wrap mf:px-[8rem] mf:gap-x-10 mf:mx-auto mf:justify-between">
         {totalRequest.map((dat, index) => {
-          return (
-            <Card
-              data={dat}
-              key={index}
-              isOpen={isOpen}
-              handleModal={handleModal}
-              setIsOpen={setIsOpen}
-            />
-          );
+          return <Card data={dat} key={index} setIsOpen={setIsOpen} />;
         })}
       </div>
       <hr className="mt-[9rem] w-[70%] mx-auto text-white" />
+      <Campaign open={isOpen} handleModal={handleModal} />
     </div>
   );
 };

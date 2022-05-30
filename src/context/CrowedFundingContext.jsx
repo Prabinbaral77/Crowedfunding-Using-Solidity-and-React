@@ -22,6 +22,8 @@ export const CrowedFundingProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState();
   const [totalRequest, setTotalRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [fundingAmount, setFundingAmount] = useState();
+  const [currentWatchRequest, setCurrentWatchRequest] = useState();
   const [formData, setFormData] = useState({
     campaignName: "",
     description: "",
@@ -104,6 +106,7 @@ export const CrowedFundingProvider = ({ children }) => {
         const tempRequest = await crowedFundingContract.requests(i);
         allRequests.push(tempRequest);
       }
+
       const structuredRequests = allRequests.map((request) => ({
         requestNo: parseInt(request.requestNo._hex),
         title: request.title,
@@ -114,9 +117,40 @@ export const CrowedFundingProvider = ({ children }) => {
         completed: request.completed,
         voter: parseInt(request.noOfVoters._hex),
         contributer: parseInt(request.noOfContributer._hex),
+        raisedAmount: parseInt(request.raisedAmount._hex),
       }));
 
       setTotalRequest(structuredRequests);
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  };
+
+  const raiseFundForFunding = async () => {
+    try {
+      if (!ethereum) return alert("Please Install Metamask.");
+      const crowedFundingContract = await getCrowedFundingContract();
+      const requestNo = await currentWatchRequest?.requestNo;
+      const parsedAmount = ethers.utils.parseEther(fundingAmount);
+      await ethereum.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from: currentAccount,
+            to: currentWatchRequest?.receipent,
+            gas: "0x5208", //21000 GWEI in decimal equivalent to hex value 0x5208
+            value: parsedAmount._hex,
+          },
+        ],
+      });
+      const raiseFundHash = await crowedFundingContract.sendEth(
+        requestNo,
+        parsedAmount._hex
+      );
+      setIsLoading(true);
+      await raiseFundHash.wait();
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
       throw new Error(error);
@@ -138,6 +172,11 @@ export const CrowedFundingProvider = ({ children }) => {
         handleNewRequests,
         isLoading,
         totalRequest,
+        raiseFundForFunding,
+        currentWatchRequest,
+        setCurrentWatchRequest,
+        fundingAmount,
+        setFundingAmount,
       }}
     >
       {children}

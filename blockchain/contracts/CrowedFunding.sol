@@ -46,14 +46,14 @@ contract CrowedFunding {
 }
 
 
-    function sendEth(uint _requestNo) external payable {
+    function sendEth(uint _requestNo, uint _ethAmount) external payable {
         require(msg.value > minContribution, "Minimum contribution of 100 wei required.");
         Request storage thisRequest = requests[_requestNo];
         if(thisRequest.contributer[msg.sender] == 0) {
             thisRequest.noOfContributer += 1;
         }
-        thisRequest.contributer[msg.sender] += msg.value;
-        thisRequest.raisedAmount += msg.value;
+        thisRequest.contributer[msg.sender] += _ethAmount;
+        thisRequest.raisedAmount += _ethAmount;
     }
 
 
